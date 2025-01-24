@@ -2570,6 +2570,38 @@ CDNS::GenericQueryResponse CDNS::CdnsBlockRead::read_generic_qr(bool& end)
     return gqr;
 }
 
+CDNS::GenericQueryResponse CDNS::CdnsBlockRead::read_generic_qr_light(bool& end)
+{
+    // Check if there are unread query responses in this block
+    if (m_qr_read >= m_query_responses.size()) {
+        end = true;
+        return GenericQueryResponse();
+    }
+
+    end = false;
+    GenericQueryResponse gqr;
+    QueryResponse& qr = m_query_responses[m_qr_read];
+
+    gqr.ts = qr.time_offset;
+
+    // Get Query Response Signature if present
+    if (qr.qr_signature_index) {
+        QueryResponseSignature qrs = get_qr_signature(*qr.qr_signature_index);
+        if (qrs.query_classtype_index)
+            gqr.query_classtype = get_classtype(*qrs.query_classtype_index);
+    }
+    if (qr.query_name_index)
+        gqr.query_name = get_name_rdata(*qr.query_name_index);
+
+    // Get implementation specific fields
+    gqr.asn = qr.asn;
+    gqr.country_code = qr.country_code;
+
+    m_qr_read++;
+    return gqr;
+}
+
+
 CDNS::GenericAddressEventCount CDNS::CdnsBlockRead::read_generic_aec(bool& end)
 {
     // Check if there are unread address event counts in this block

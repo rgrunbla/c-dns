@@ -1472,6 +1472,17 @@ namespace CDNS {
         void read(CdnsDecoder& dec, std::vector<BlockParameters>& block_parameters);
 
         /**
+         * @brief Read next generic QueryResponse from the block, light version
+         *
+         * Once this method is first called on the block DO NOT modify the block anymore by adding
+         * or removing QueryResponses.
+         * @param end If set by this method to TRUE, then the block has read all QueryResponses it
+         * contains and the returned GenericQueryResponse is empty. Otherwise set to FALSE.
+         * @return Next QueryResponse read from input stream
+         */
+        GenericQueryResponse read_generic_qr_light(bool& end);
+        
+	/**
          * @brief Read next generic QueryResponse from the block.
          *
          * Once this method is first called on the block DO NOT modify the block anymore by adding
